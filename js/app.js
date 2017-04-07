@@ -88,7 +88,6 @@ Field.prototype.eatFood = function(x, y) {
         if (this.foods[i].x == x && this.foods[i].y == y) {
             this.food_elems--;
             result = Math.floor(this.foods[i].ttl / 10) + 1;
-            console.log(result);
         } else {
             new_foods.push(this.foods[i]);
         }
@@ -135,8 +134,8 @@ var Snake = function(field) {
     field.putElem(x, y, 'snake');
     field.putElem(x1, y, 'snake');
 
-    this.dir = { 'x' : 1, 'y' : 0};
-    this.dirname = 'right';
+    this.dir = 'right';
+    this.next_dir = 'right';
     this.pos = 0.0;
     this.speed = 5;
     this.alive = true;
@@ -158,8 +157,28 @@ Snake.prototype.update = function(dt) {
 
     this.pos += this.speed * dt;
     while (this.pos >= 1) {
-        var new_x = (this.points[this.head].x + this.dir.x) % this.cols;
-        var new_y = (this.points[this.head].y + this.dir.y) % this.rows;
+        dir = {'x': 0, 'y': 0};
+        switch (this.next_dir) {
+        case 'right':
+            dir.x = 1;
+            this.dir = 'right';
+            break;
+        case 'left':
+            dir.x = -1;
+            this.dir = 'left';
+            break;
+        case 'down':
+            dir.y = 1;
+            this.dir = 'down';
+            break;
+        case 'up':
+            dir.y = -1;
+            this.dir = 'up';
+            break;
+        }
+
+        var new_x = (this.points[this.head].x + dir.x) % this.cols;
+        var new_y = (this.points[this.head].y + dir.y) % this.rows;
         if (new_x < 0) {
             new_x = this.cols + new_x;
         }
@@ -196,28 +215,16 @@ Snake.prototype.update = function(dt) {
 
 
 Snake.prototype.turn = function(dirname) {
-    if (dirname == this.dirname) {
+    if (dirname == this.dir) {
+        this.next_dir = dirname;
         return;
     }
 
-    if (dirname == 'left' && this.dirname != 'right') {
-        this.dir = {'x': -1, 'y': 0};
-        this.dirname = dirname;
-    }
-
-    if (dirname == 'right' && this.dirname != 'left') {
-        this.dir = {'x': 1, 'y': 0};
-        this.dirname = dirname;
-    }
-
-    if (dirname == 'up' && this.dirname != 'down') {
-        this.dir = {'x': 0, 'y': -1};
-        this.dirname = dirname;
-    }
-
-    if (dirname == 'down' && this.dirname != 'up') {
-        this.dir = {'x': 0, 'y': 1};
-        this.dirname = dirname;
+    if (dirname == 'left' && this.dir != 'right' || 
+        dirname == 'right' && this.dir != 'left' ||
+        dirname == 'up' && this.dir != 'down' ||
+        dirname == 'down' && this.dir != 'up') {
+        this.next_dir = dirname;
     }
 }
 
