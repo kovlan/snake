@@ -17,7 +17,7 @@ var Engine = (function(global) {
     var canvas_width = elem_width * field_width + 2 * border_size;
     var canvas_height = elem_height * field_height + 2 * border_size;
     
-    var playing = true;
+    var playing = false;
     var paused = false;
     
     var field = {};
@@ -140,6 +140,7 @@ var Engine = (function(global) {
     function reset() {
         field = new Field(field_width, field_height, stone_percentage);
         snake = new Snake(field);
+        playing = true;
     }
 
     document.addEventListener('keydown', function(e) {
@@ -152,6 +153,11 @@ var Engine = (function(global) {
         // pause/resume on P/p
         if (e.keyCode == 80 || e.keyCode == 112) {
             paused = !paused;
+        }
+
+        // start new game
+        if (e.keyCode == 13 && !playing) {
+            win.requestAnimationFrame(init);
         }
 
         // move
