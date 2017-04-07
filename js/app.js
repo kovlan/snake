@@ -130,6 +130,7 @@ var Snake = function(field) {
     this.points = [ {'x': x, 'y': y}, {'x': x1, 'y': y} ];
     this.head = 1;
     this.tail = 0;
+    this.max_deleted_points = 10;
 
     field.putElem(x, y, 'snake');
     field.putElem(x1, y, 'snake');
@@ -210,6 +211,17 @@ Snake.prototype.update = function(dt) {
 
         this.field.putElem(new_x, new_y, 'snake');
         this.pos -= 1;
+
+        // delete first N elements so points array is never too long
+        if (this.tail >= this.max_deleted_points) {
+            var new_points = [];
+            for (var i = this.tail; i <= this.head; ++i) {
+                new_points.push(this.points[i]);
+            }
+            this.points = new_points;
+            this.head -= this.tail;
+            this.tail = 0;
+        }
     }
 }
 
