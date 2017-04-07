@@ -228,3 +228,7 @@ Snake.prototype.turn = function(dirname) {
     }
 }
 
+Snake.prototype.getLength = function() {
+    return this.head - this.tail + 1;
+}
+

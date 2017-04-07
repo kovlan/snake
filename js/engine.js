@@ -13,9 +13,10 @@ var Engine = (function(global) {
     var field_width = 40;
     var field_height = 30;
     var stone_percentage = 0.05;
+    var score_height = 50;
     
     var canvas_width = elem_width * field_width + 2 * border_size;
-    var canvas_height = elem_height * field_height + 2 * border_size;
+    var canvas_height = elem_height * field_height + 2 * border_size + score_height;
     
     var playing = false;
     var paused = false;
@@ -135,6 +136,12 @@ var Engine = (function(global) {
                      elem_width,
                      elem_height,
                      snake_color);
+
+        // draw score
+        ctx.font = '24px serif';
+        ctx.fillText('Snake length: ' + snake.getLength().toString(), 
+                     border_size,
+                     bottom_line_y + 36);
     }
 
     function reset() {
