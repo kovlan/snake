@@ -59,7 +59,7 @@ Field.prototype.update = function(dt) {
             var food_y = Math.floor((Math.random() * this.rows));
             if (this.elems[food_y][food_x] == 'none') {
                 this.elems[food_y][food_x] = 'food';
-                var ttl = Math.floor(Math.random() * 100) + 10;
+                var ttl = Math.floor(Math.random() * 50) + 10;
                 this.foods.push({'x': food_x, 'y':food_y, 'ttl': ttl});
                 this.food_elems++;
                 break;
@@ -69,7 +69,7 @@ Field.prototype.update = function(dt) {
 
     var new_foods = [];
     for (var i in this.foods) {
-        this.foods[i].ttl -= 5 * dt;
+        this.foods[i].ttl -= dt;
         if (this.foods[i].ttl > 0) {
             new_foods.push(this.foods[i]);
         } else {
@@ -85,15 +85,28 @@ Field.prototype.eatFood = function(x, y) {
     var result = 0;
     var new_foods = [];
     for (var i in this.foods) {
-        if (this.foods[i].x == x && this.foods.y == y) {
+        if (this.foods[i].x == x && this.foods[i].y == y) {
             this.food_elems--;
             result = Math.floor(this.foods[i].ttl / 10) + 1;
+            console.log(result);
         } else {
             new_foods.push(this.foods[i]);
         }
     }
 
     this.foods = new_foods;
+    return result;
+}
+
+Field.prototype.getFoodStrength = function(x, y) {
+    var result = 0;
+    for (var i in this.foods) {
+        if (this.foods[i].x == x && this.foods[i].y == y) {
+            result = this.foods[i].ttl;
+        }
+    }
+
+    return result;
 }
 
 
@@ -119,7 +132,6 @@ var Snake = function(field) {
     this.head = 1;
     this.tail = 0;
 
-    console.log([x, y, x1, y]);
     field.putElem(x, y, 'snake');
     field.putElem(x1, y, 'snake');
 
@@ -158,7 +170,7 @@ Snake.prototype.update = function(dt) {
         var new_value = this.field.getValue(new_x, new_y);
         if (new_value == 'food') {
             var inc = this.field.eatFood(new_x, new_y);
-            this.feedlen++;
+            this.feedlen += inc;
         }
 
         this.points.push({ 'x' : new_x, 'y' : new_y});

@@ -16,7 +16,9 @@ var Engine = (function(global) {
     
     var canvas_width = elem_width * field_width + 2 * border_size;
     var canvas_height = elem_height * field_height + 2 * border_size;
+    
     var playing = true;
+    var paused = false;
     
     var field = {};
     var snake = {};
@@ -29,13 +31,15 @@ var Engine = (function(global) {
 
         var now = Date.now();
 
-        var dt = (now - lastTime) / 1000.0;
+        if (!paused) {
+            var dt = (now - lastTime) / 1000.0;
 
-        update(dt);
-        render();
+            update(dt);
+            render();
 
-        if (!snake.isAlive()) {
-            playing = false;
+            if (!snake.isAlive()) {
+                playing = false;
+            }
         }
 
         lastTime = now;
@@ -64,7 +68,9 @@ var Engine = (function(global) {
 
     function renderCircle(x, y, w, h, col) {
         ctx.fillStyle = col;
-        ctx.fillCircle(x, y, w, h);
+        ctx.beginPath();
+        ctx.arc(x + w / 2, y + h / 2, w / 2, 0, 2 * Math.PI, true);
+        ctx.fill();
         ctx.fillStyle='black';
     }
 
@@ -105,11 +111,14 @@ var Engine = (function(global) {
                                  '#884400');
                     break;
                 case 'food':
-                    renderSquare(border_size + col * elem_width,
+                    var fs = field.getFoodStrength(col, row);
+                    var hcol = 125 - Math.floor(fs * 120/60);
+                    var food_color = "rgb(" + hcol.toString() + ",255," + hcol.toString() + ")";
+                    renderCircle(border_size + col * elem_width,
                                  border_size + row * elem_height,
                                  elem_width,
                                  elem_height,
-                                 '#00FF00');
+                                 food_color);
                     break;
                 }
             }
@@ -140,6 +149,10 @@ var Engine = (function(global) {
             39: 'right',
             40: 'down',
         };
+        // pause/resume on P/p
+        if (e.keyCode == 80 || e.keyCode == 112) {
+            paused = !paused;
+        }
 
         // move
         if (allowedKeys[e.keyCode]) {
